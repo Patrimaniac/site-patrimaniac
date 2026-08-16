@@ -1,0 +1,24 @@
+[
+  {
+    "titre": "Visite commentée — titre à venir",
+    "date": "2026-09-12",
+    "heure": "14h",
+    "lieu": "Lieu de rendez-vous",
+    "info": "Gratuit, sur inscription",
+    "inscription": "mailto:patrimaniac.contact@gmail.com?subject=Inscription%20visite%20du%2012%20septembre"
+  },
+  {
+    "titre": "Atelier pédagogique — titre à venir",
+    "date": "2026-10-04",
+    "heure": "10h",
+    "lieu": "Lieu",
+    "info": "Public concerné"
+  },
+  {
+    "titre": "Assemblée générale ordinaire",
+    "date": "2026-11-22",
+    "heure": "18h30",
+    "lieu": "Lieu à confirmer",
+    "info": "Ouverte à tous les membres"
+  }
+]
