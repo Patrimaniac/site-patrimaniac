@@ -1,0 +1,70 @@
+name: Synchronisation Instagram
+
+on:
+  schedule:
+    # Tous les jours à 5h05 UTC (7h05 en France l'été, 6h05 l'hiver).
+    - cron: '5 5 * * *'
+  workflow_dispatch:        # permet aussi de lancer la synchro à la main
+
+permissions:
+  contents: write
+
+jobs:
+  synchroniser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Récupérer les publications
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node scripts/sync-instagram.mjs
+
+      - name: Publier les changements
+        run: |
+          git config user.name  "Robot Patrimaniac"
+          git config user.email "actions@github.com"
+          git add data/instagram.json public/instagram-media
+          if git diff --staged --quiet; then
+            echo "Aucune nouveauté depuis hier."
+          else
+            git commit -m "Mise à jour du flux Instagram"
+            git push
+          fi
+
+  renouveler_jeton:
+    # Le lundi uniquement : inutile de renouveler tous les jours.
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Demander un nouveau jeton
+        id: jeton
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node scripts/refresh-token.mjs
+
+      - name: Enregistrer le nouveau jeton dans les secrets
+        if: steps.jeton.outputs.nouveau_jeton != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "GH_PAT absent : le jeton devra être remplacé à la main avant expiration."
+            exit 0
+          fi
+          gh secret set IG_TOKEN --body "${{ steps.jeton.outputs.nouveau_jeton }}" --repo "${{ github.repository }}"
+          echo "Secret IG_TOKEN mis à jour."
