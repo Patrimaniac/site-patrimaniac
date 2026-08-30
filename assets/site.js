@@ -197,7 +197,9 @@ async function chargerHelloAsso() {
       return '<article class="card">' +
         '<span class="tag" style="background:#B9B0E5">' + proteger(libelle) + '</span>' +
         '<h3>' + proteger(f.titre) + '</h3>' +
-        (f.description ? '<p>' + proteger(f.description) + '</p>' : '') +
+        (f.description
+          ? '<p class="desc">' + proteger(f.description).replace(/\n/g, '<br>') + '</p>'
+          : '') +
         '<p style="margin-top:1.2rem"><a class="btn btn-solid" href="' + proteger(f.url) +
         '" target="_blank" rel="noopener noreferrer">' + proteger(libelle) + '</a></p>' +
         '</article>';
