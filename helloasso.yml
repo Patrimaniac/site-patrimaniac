@@ -1,0 +1,41 @@
+name: Synchronisation HelloAsso
+
+on:
+  schedule:
+    # Tous les jours a 5h35 UTC, une demi-heure apres Instagram.
+    - cron: '35 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  synchroniser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Recuperer les formulaires
+        env:
+          HA_CLIENT_ID: ${{ secrets.HA_CLIENT_ID }}
+          HA_CLIENT_SECRET: ${{ secrets.HA_CLIENT_SECRET }}
+          HA_SLUG: ${{ secrets.HA_SLUG }}
+        run: node scripts/sync-helloasso.mjs
+
+      - name: Publier les changements
+        run: |
+          git config user.name  "Robot Patrimaniac"
+          git config user.email "actions@github.com"
+          git add data/helloasso.json
+          if git diff --staged --quiet; then
+            echo "Aucun changement depuis hier."
+          else
+            git commit -m "Mise a jour des formulaires HelloAsso"
+            git push
+          fi
