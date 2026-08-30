@@ -53,6 +53,30 @@ async function recupererFormulaires(jeton) {
   return j.data || [];
 }
 
+// Les descriptions HelloAsso peuvent contenir du balisage : on le retire
+// et on conserve les retours a la ligne, utiles pour lister des avantages.
+function nettoyer(texte) {
+  return String(texte || '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&eacute;/g, 'e\u0301').replace(/&egrave;/g, 'e\u0300')
+    .replace(/&agrave;/g, 'a\u0300').replace(/&ccedil;/g, 'c\u0327')
+    .replace(/&ecirc;/g, 'e\u0302').replace(/&ocirc;/g, 'o\u0302')
+    .replace(/&hellip;/g, '\u2026').replace(/&rsquo;/g, "'")
+    .normalize('NFC')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]+/g, ' ')
+    .trim()
+    .slice(0, 1200);
+}
+
 function normaliser(f) {
   const banniere = f.banner || {};
   return {
@@ -62,7 +86,7 @@ function normaliser(f) {
     debut: f.startDate || null,
     fin: f.endDate || null,
     image: banniere.publicUrl || null,
-    description: (f.description || '').slice(0, 240)
+    description: nettoyer(f.description)
   };
 }
 
