@@ -1,6 +1,6 @@
 {
   "organisation": "https://www.helloasso.com/associations/patrimaniac",
-  "misAJour": "2026-08-30T14:43:30.671Z",
+  "misAJour": "2026-08-30T14:53:14.722Z",
   "formulaires": [
     {
       "titre": "Adhésion Membre actif",
@@ -9,7 +9,7 @@
       "debut": null,
       "fin": null,
       "image": null,
-      "description": "Tous les avantages de la formule Membre, et la possibilité de vous impliquer dans la vie de l'association. Vous accédez à l'ensemble de nos contenus, vous pouvez soumettre vos propositions au Bureau à titre consultatif, et vous êtes invité "
+      "description": "Tous les avantages de la formule Membre, et la possibilité de vous impliquer dans la vie de l'association. Vous accédez à l'ensemble de nos contenus, vous pouvez soumettre vos propositions au Bureau à titre consultatif, et vous êtes invité à participer à la création de contenus de médiation. Les contenus publiés sous le nom Patrimaniac sont validés au préalable par les membres fondateurs."
     },
     {
       "titre": "Adhésion Membre ",
@@ -18,7 +18,7 @@
       "debut": null,
       "fin": null,
       "image": null,
-      "description": "Nous ne conservons que votre nom, votre adresse mail et, si vous nous le communiquez, votre numéro de téléphone. Ils servent uniquement à gérer votre adhésion, à vous envoyer notre newsletter et à vous inclure dans nos groupes WhatsApp si v"
+      "description": "Soutenez la vulgarisation du patrimoine et restez au plus près de nos actions. Vous recevez notre newsletter et accédez à des contenus exclusifs réservés aux membres."
     },
     {
       "titre": "Campagne de dons patrimaniac",
