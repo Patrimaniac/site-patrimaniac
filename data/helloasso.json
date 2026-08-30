@@ -1,24 +1,24 @@
 {
   "organisation": "https://www.helloasso.com/associations/patrimaniac",
-  "misAJour": "2026-08-30T10:16:39.005Z",
+  "misAJour": "2026-08-30T14:37:44.475Z",
   "formulaires": [
     {
-      "titre": "Adhésion membre classique",
+      "titre": "Adhésion Membre ",
       "type": "Membership",
-      "url": "https://www.helloasso.com/associations/patrimaniac/adhesions/adhesion-membre-classique",
+      "url": "https://www.helloasso.com/associations/patrimaniac/adhesions/adhesion-membre",
       "debut": null,
       "fin": null,
       "image": null,
-      "description": "En adhérant à notre association, vous soutiendrez les membres de patrimaniac."
+      "description": "Nous ne conservons que votre nom, votre adresse mail et, si vous nous le communiquez, votre numéro de téléphone. Ils servent uniquement à gérer votre adhésion, à vous envoyer notre newsletter et à vous inclure dans nos groupes WhatsApp si v"
     },
     {
-      "titre": "Adhésion membre classique",
-      "type": "Event",
-      "url": "https://www.helloasso.com/associations/patrimaniac/evenements/adhesion-membre-classique",
+      "titre": "Campagne de dons patrimaniac",
+      "type": "Donation",
+      "url": "https://www.helloasso.com/associations/patrimaniac/formulaires/1",
       "debut": null,
       "fin": null,
       "image": null,
-      "description": "En adhérant à notre association vous soutiendrez les membres de patrimaniac. "
+      "description": ""
     }
   ]
 }
