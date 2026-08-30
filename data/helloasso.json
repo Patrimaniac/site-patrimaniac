@@ -1,7 +1,16 @@
 {
   "organisation": "https://www.helloasso.com/associations/patrimaniac",
-  "misAJour": "2026-08-30T14:37:44.475Z",
+  "misAJour": "2026-08-30T14:43:30.671Z",
   "formulaires": [
+    {
+      "titre": "Adhésion Membre actif",
+      "type": "Membership",
+      "url": "https://www.helloasso.com/associations/patrimaniac/adhesions/adhesion-membre-actif",
+      "debut": null,
+      "fin": null,
+      "image": null,
+      "description": "Tous les avantages de la formule Membre, et la possibilité de vous impliquer dans la vie de l'association. Vous accédez à l'ensemble de nos contenus, vous pouvez soumettre vos propositions au Bureau à titre consultatif, et vous êtes invité "
+    },
     {
       "titre": "Adhésion Membre ",
       "type": "Membership",
