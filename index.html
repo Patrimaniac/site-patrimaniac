@@ -179,6 +179,7 @@ input,textarea,select{width:100%;font:inherit;font-size:1rem;padding:.85rem 1rem
 input:focus,textarea:focus,select:focus{outline:2px solid var(--mauve);outline-offset:1px;border-color:var(--mauve)}
 textarea{min-height:140px;resize:vertical}
 .form-note{font-size:.8rem;color:#4a4550;margin:0}
+.form-etat{font-size:.9rem;margin:.2rem 0 0}
 .contact-info{margin-top:2rem;font-size:.95rem}
 .contact-info dt{font-family:'League Spartan',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--mauve);margin-top:1.1rem}
@@ -452,7 +453,7 @@ footer a:hover{opacity:1;text-decoration:underline}
         <dd><a href="#reseaux">Instagram, TikTok, Facebook et LinkedIn</a></dd>
       </dl>
     </div>
-    <form onsubmit="event.preventDefault();alert('Formulaire de démonstration : il sera branché sur la vraie boîte mail à la mise en ligne.')">
+    <form id="form-contact" novalidate>
       <div>
         <label for="nom">Votre nom</label>
         <input id="nom" name="nom" type="text" autocomplete="name" required>

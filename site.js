@@ -65,9 +65,18 @@ function carteEvenement(ev) {
     lien + '</div>';
 }
 
+// Certains formulaires sont crees en billetterie alors qu'ils servent
+// d'adhesion ou de collecte. On se fie alors au titre plutot qu'au type.
+var MOTS_SOUTIEN = /adh[eé]sion|cotisation|adherer|adh[eé]rer|don\b|dons\b|soutien|soutenir|membre|m[eé]c[eé]nat|boutique/i;
+
+function estSoutien(f) {
+  if (f.type && f.type !== 'Event') return true;
+  return MOTS_SOUTIEN.test(f.titre || '');
+}
+
 // Transforme une billetterie HelloAsso en evenement d'agenda.
 function evenementDepuisHelloAsso(f) {
-  if (f.type !== 'Event' || !f.debut) return null;
+  if (estSoutien(f) || !f.debut) return null;
   var d = new Date(f.debut);
   if (isNaN(d)) return null;
   var heure = d.getHours() + 'h' + (d.getMinutes() ? String(d.getMinutes()).padStart(2, '0') : '');
@@ -176,16 +185,21 @@ async function chargerHelloAsso() {
 
     if (lienOrga && ha.organisation) lienOrga.href = ha.organisation;
 
-    // Les billetteries d'evenements sont deja affichees dans l'agenda.
-    var pertinents = formulaires.filter(function (f) { return f.type !== 'Event'; });
+    // Les vraies billetteries d'evenements sont deja affichees dans l'agenda.
+    var pertinents = formulaires.filter(estSoutien);
     if (!pertinents.length) return;
 
     zone.innerHTML = pertinents.map(function (f) {
       var libelle = LIBELLES[f.type] || 'En savoir plus';
+      if (f.type === 'Event' && /adh[eé]sion|cotisation|membre/i.test(f.titre || '')) {
+        libelle = 'Adherer';
+      }
       return '<article class="card">' +
         '<span class="tag" style="background:#B9B0E5">' + proteger(libelle) + '</span>' +
         '<h3>' + proteger(f.titre) + '</h3>' +
-        (f.description ? '<p>' + proteger(f.description) + '</p>' : '') +
+        (f.description
+          ? '<p class="desc">' + proteger(f.description).replace(/\n/g, '<br>') + '</p>'
+          : '') +
         '<p style="margin-top:1.2rem"><a class="btn btn-solid" href="' + proteger(f.url) +
         '" target="_blank" rel="noopener noreferrer">' + proteger(libelle) + '</a></p>' +
         '</article>';
@@ -198,3 +212,87 @@ async function chargerHelloAsso() {
 chargerAgenda();
 chargerInstagram();
 chargerHelloAsso();
+
+/* ---------- Formulaire de contact ----------
+   Deux modes de fonctionnement :
+   - si CLE_WEB3FORMS contient une vraie cle, le message est envoye
+     directement par le service Web3Forms, sans quitter le site ;
+   - sinon, le message ouvre le logiciel de messagerie de l'utilisateur,
+     pre-rempli. Cela fonctionne partout, sans aucune inscription.
+
+   Pour obtenir une cle : web3forms.com, saisir l'adresse de l'association,
+   la cle arrive par mail. Elle n'est pas secrete, elle figure dans la page. */
+
+var CLE_WEB3FORMS = 'dee49aec-8b14-4ced-8ee0-f99c32978133';
+var MAIL_ASSOCIATION = 'patrimaniac.contact@gmail.com';
+
+function messageEtat(formulaire, texte, type) {
+  var zone = formulaire.querySelector('.form-etat');
+  if (!zone) {
+    zone = document.createElement('p');
+    zone.className = 'form-etat';
+    zone.setAttribute('role', 'status');
+    formulaire.appendChild(zone);
+  }
+  zone.textContent = texte;
+  zone.style.color = (type === 'erreur') ? '#C94A4A' : '#4D9368';
+  zone.style.fontWeight = '500';
+}
+
+function brancherFormulaire() {
+  var f = document.getElementById('form-contact');
+  if (!f) return;
+
+  f.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    var nom = f.nom.value.trim();
+    var mail = f.mail.value.trim();
+    var sujet = f.sujet.value;
+    var msg = f.msg.value.trim();
+    if (!nom || !mail || !msg) return;
+
+    var bouton = f.querySelector('button[type=submit]');
+    var libelleInitial = bouton ? bouton.textContent : '';
+
+    // Mode de secours : ouverture du logiciel de messagerie
+    if (CLE_WEB3FORMS === 'A_REMPLACER') {
+      var corps = 'Nom : ' + nom + '\nEmail : ' + mail + '\n\n' + msg;
+      window.location.href = 'mailto:' + MAIL_ASSOCIATION +
+        '?subject=' + encodeURIComponent('[Site] ' + sujet) +
+        '&body=' + encodeURIComponent(corps);
+      messageEtat(f, 'Votre logiciel de messagerie va s\'ouvrir avec le message pre-rempli. Il ne reste qu\'a l\'envoyer.', 'ok');
+      return;
+    }
+
+    if (bouton) { bouton.disabled = true; bouton.textContent = 'Envoi en cours...'; }
+
+    try {
+      var r = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: CLE_WEB3FORMS,
+          subject: '[Site Patrimaniac] ' + sujet,
+          from_name: 'Site Patrimaniac',
+          name: nom,
+          email: mail,
+          objet: sujet,
+          message: msg
+        })
+      });
+      var j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || 'envoi refuse');
+
+      f.reset();
+      messageEtat(f, 'Merci, votre message est bien parti. Nous repondons sous une semaine.', 'ok');
+    } catch (err) {
+      messageEtat(f, 'L\'envoi a echoue. Ecrivez-nous directement a ' + MAIL_ASSOCIATION, 'erreur');
+      console.error('Formulaire :', err);
+    } finally {
+      if (bouton) { bouton.disabled = false; bouton.textContent = libelleInitial; }
+    }
+  });
+}
+
+brancherFormulaire();
