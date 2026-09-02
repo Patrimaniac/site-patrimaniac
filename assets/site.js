@@ -212,3 +212,91 @@ async function chargerHelloAsso() {
 chargerAgenda();
 chargerInstagram();
 chargerHelloAsso();
+
+/* ---------- Formulaire de contact ----------
+   Deux modes de fonctionnement :
+   - si CLE_WEB3FORMS contient une vraie cle, le message est envoye
+     directement par le service Web3Forms, sans quitter le site ;
+   - sinon, le message ouvre le logiciel de messagerie de l'utilisateur,
+     pre-rempli. Cela fonctionne partout, sans aucune inscription.
+
+   Pour obtenir une cle : web3forms.com, saisir l'adresse de l'association,
+   la cle arrive par mail. Elle n'est pas secrete, elle figure dans la page. */
+
+// Cle Web3Forms conservee mais desactivee : le service n'a pas remis les
+// messages lors des essais. Pour reessayer plus tard, remplacer la ligne
+// active par la ligne mise en commentaire juste en dessous.
+var CLE_WEB3FORMS = 'A_REMPLACER';
+// var CLE_WEB3FORMS = 'dee49aec-8b14-4ced-8ee0-f99c32978133';
+var MAIL_ASSOCIATION = 'patrimaniac.contact@gmail.com';
+
+function messageEtat(formulaire, texte, type) {
+  var zone = formulaire.querySelector('.form-etat');
+  if (!zone) {
+    zone = document.createElement('p');
+    zone.className = 'form-etat';
+    zone.setAttribute('role', 'status');
+    formulaire.appendChild(zone);
+  }
+  zone.textContent = texte;
+  zone.style.color = (type === 'erreur') ? '#C94A4A' : '#4D9368';
+  zone.style.fontWeight = '500';
+}
+
+function brancherFormulaire() {
+  var f = document.getElementById('form-contact');
+  if (!f) return;
+
+  f.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    var nom = f.nom.value.trim();
+    var mail = f.mail.value.trim();
+    var sujet = f.sujet.value;
+    var msg = f.msg.value.trim();
+    if (!nom || !mail || !msg) return;
+
+    var bouton = f.querySelector('button[type=submit]');
+    var libelleInitial = bouton ? bouton.textContent : '';
+
+    // Mode de secours : ouverture du logiciel de messagerie
+    if (CLE_WEB3FORMS === 'A_REMPLACER') {
+      var corps = 'Nom : ' + nom + '\nEmail : ' + mail + '\n\n' + msg;
+      window.location.href = 'mailto:' + MAIL_ASSOCIATION +
+        '?subject=' + encodeURIComponent('[Site] ' + sujet) +
+        '&body=' + encodeURIComponent(corps);
+      messageEtat(f, 'Votre logiciel de messagerie va s\'ouvrir avec le message pre-rempli. Il ne reste qu\'a l\'envoyer.', 'ok');
+      return;
+    }
+
+    if (bouton) { bouton.disabled = true; bouton.textContent = 'Envoi en cours...'; }
+
+    try {
+      var r = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: CLE_WEB3FORMS,
+          subject: '[Site Patrimaniac] ' + sujet,
+          from_name: 'Site Patrimaniac',
+          name: nom,
+          email: mail,
+          objet: sujet,
+          message: msg
+        })
+      });
+      var j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || 'envoi refuse');
+
+      f.reset();
+      messageEtat(f, 'Merci, votre message est bien parti. Nous repondons sous une semaine.', 'ok');
+    } catch (err) {
+      messageEtat(f, 'L\'envoi a echoue. Ecrivez-nous directement a ' + MAIL_ASSOCIATION, 'erreur');
+      console.error('Formulaire :', err);
+    } finally {
+      if (bouton) { bouton.disabled = false; bouton.textContent = libelleInitial; }
+    }
+  });
+}
+
+brancherFormulaire();
